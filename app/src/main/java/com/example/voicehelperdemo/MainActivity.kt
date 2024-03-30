@@ -5,7 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -49,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                 needRequestPermission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
         } else {
-            if (ContextCompat.checkSelfPermission(this,Manifest.permission.MANAGE_EXTERNAL_STORAGE) != 0) {
+            if (!Environment.isExternalStorageManager()) {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                 intent.data = Uri.parse("package:" + getPackageName())
                 startActivityForResult(intent,2)
@@ -58,19 +60,35 @@ class MainActivity : AppCompatActivity() {
         if (needRequestPermission.isNotEmpty()){
             ActivityCompat.requestPermissions(this,needRequestPermission.toTypedArray(),100)
         } else {
-            jumpToTask()
+            initView()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == 100 || requestCode == 2){
-            jumpToTask()
+            initView()
         }
     }
 
-    private fun jumpToTask(){
+    fun initView() {
+        findViewById<Button>(R.id.btn_wakeup).setOnClickListener { jumpToWakeUpTask() }
+        findViewById<Button>(R.id.btn_dictation).setOnClickListener { jumpToDictationTask() }
+        findViewById<Button>(R.id.btn_commander).setOnClickListener { jumpToCommanderTask() }
+    }
+
+    private fun jumpToWakeUpTask() {
+        val intent = Intent(this,WakeUpActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun jumpToDictationTask() {
         val intent = Intent(this,DictationActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun jumpToCommanderTask() {
+        val intent = Intent(this,CommanderActivity::class.java)
         startActivity(intent)
     }
 }

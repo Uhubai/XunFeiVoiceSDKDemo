@@ -14,12 +14,12 @@ import com.iflytek.aikit.core.BaseLibrary.Params
 import com.iflytek.aikit.core.ErrType
 import java.util.concurrent.atomic.AtomicReference
 
-
 object VoiceHelper {
     private const val TAG = "VoiceHelper"
-    var currentAction = AtomicReference("")
-    val aiHelper: AiHelper = AiHelper.getInst()
-    var aiHandle: AiHandle? = null
+    private var currentAction = AtomicReference("")
+    private val aiHelper: AiHelper = AiHelper.getInst()
+    private var aiHandle: AiHandle? = null
+    private var aiResultListener: AiResultListener? = null
 
     private val coreListener = AuthListener { type, code ->
         Log.i(TAG, "core listener code:$code")
@@ -33,6 +33,7 @@ object VoiceHelper {
         override fun onResult(p0: Int, outputData: MutableList<AiResponse>?, p2: Any?) {
             if (null != outputData && outputData.size > 0) {
                 for (i in 0 until outputData.size) {
+                    aiResultListener?.onResult(p0, outputData[i], p2)
                     val bytes: ByteArray = outputData[i].value ?: continue
                     val key: String = outputData[i].key
                     //获取到结果的key及value，可根据业务保存存储结果或其他处理
@@ -64,9 +65,9 @@ object VoiceHelper {
         // 初始化
         AiHelper.getInst().registerListener(coreListener);// 注册SDK 初始化状态监听
         AiHelper.getInst().registerListener(
-            context.resources.getString(R.string.ability_dictation),
+            ability,
             aiRespListener
-        );// 注册能力结果监听
+        )// 注册能力结果监听
         aiHelper.init(context, params)
         currentAction.set(ability)
     }
@@ -126,5 +127,17 @@ object VoiceHelper {
 
     fun unInit() {
         AiHelper.getInst().unInit();
+    }
+
+    fun registerAiResultListener(aiResultListener: AiResultListener) {
+        this.aiResultListener = aiResultListener
+    }
+    fun unregisterAiResultListener(aiResultListener: AiResultListener) {
+        if(aiResultListener == this.aiResultListener)
+            this.aiResultListener = null
+    }
+
+    interface AiResultListener {
+        fun onResult(p0: Int, outputData: AiResponse, p2: Any?)
     }
 }
