@@ -2,6 +2,8 @@
     <string name="app_id">77283642</string>
     <string name="api_key">f5c692bc587909e9cd9ab86044a01b34</string>
     <string name="api_secret">M2FiODU5ZWE3MDA5NDUwYzdhMzBiMTQx</string>
+    <string name="ability_wakeup">e867a88f2</string>
     <string name="ability_dictation">ee62fa27c</string>
+    <string name="ability_commander">e75f07b62</string>
     <string name="app_name">VoiceHelperDemo</string>
 </resources>

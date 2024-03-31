@@ -7,13 +7,34 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/btn_wakeup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="58dp"
+        android:text="WakeUp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_dictation"
+        app:layout_constraintStart_toStartOf="@+id/btn_dictation" />
+
+    <Button
+        android:id="@+id/btn_dictation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="11dp"
+        android:layout_marginBottom="34dp"
+        android:text="Dictation"
+        app:layout_constraintBottom_toTopOf="@+id/btn_commander"
+        app:layout_constraintStart_toStartOf="@+id/btn_commander" />
+
+    <Button
+        android:id="@+id/btn_commander"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="289dp"
+        android:text="Commander"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

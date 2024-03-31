@@ -9,18 +9,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.voicehelperdemo.databinding.ActivityDictationBinding
+import com.example.voicehelperdemo.databinding.ActivityCommanderBinding
 import com.iflytek.aikit.core.AiRequest
 import com.iflytek.aikit.core.AiResponse
-import java.nio.charset.Charset
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-
 @SuppressLint("MissingPermission")
-class DictationActivity : AppCompatActivity() {
-
-    private val binding by lazy { ActivityDictationBinding.inflate(layoutInflater) }
+class CommanderActivity : AppCompatActivity() {
+    private val binding by lazy { ActivityCommanderBinding.inflate(layoutInflater) }
     private val isRecording = AtomicBoolean(false)
     private val minBufferSize = AudioRecord.getMinBufferSize(
         16000,
@@ -51,7 +48,7 @@ class DictationActivity : AppCompatActivity() {
     private val aiResultListener = object :VoiceHelper.AiResultListener{
         override fun onResult(p0: Int, outputData: AiResponse, p2: Any?) {
             runOnUiThread {
-                binding.txt.text = String(outputData.value, Charset.forName("GB2312"))
+                binding.txt.text = String(outputData.value)
             }
         }
     }
@@ -60,43 +57,36 @@ class DictationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
-        initView()
-        VoiceHelper.initSDK(this, resources.getString(R.string.ability_dictation))
-        VoiceHelper.registerAiResultListener(aiResultListener)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        initView()
+        VoiceHelper.initSDK(this, resources.getString(R.string.ability_commander))
+        VoiceHelper.registerAiResultListener(aiResultListener)
     }
 
     private fun initView() {
-        binding.button.setOnClickListener {
-            if (!isRecording.get()) {
+        binding.btn.setOnClickListener {
+            if (isRecording.get()) {
+                audioRecord.stop()
+                isRecording.set(false)
+            } else {
                 val paramBuilder = AiRequest.builder()
-                paramBuilder.param("lmLoad", false);
-                paramBuilder.param("vadLoad", false);
-                paramBuilder.param("lmOn", false);
-                paramBuilder.param("numLoad", false);
-                paramBuilder.param("puncLoad", false);
+                paramBuilder.param("languageType", 0)
+                paramBuilder.param("vadOn", true)
                 paramBuilder.param("vadLinkOn", false);
-                paramBuilder.param("vadOn", false);
+                paramBuilder.param("vadEndGap", 60)
+                paramBuilder.param("beamThreshold", 20);
+                paramBuilder.param("hisGramThreshold", 3000);
+                paramBuilder.param("vadSpeechEnd", 80);
+                paramBuilder.param("vadResponsetime", 1000);
                 paramBuilder.param("postprocOn", false);
-                paramBuilder.param("vadResponsetime", 6000);
-                paramBuilder.param("vadSpeechEnd", 200);
-                paramBuilder.param("dialectType", 0);
-                paramBuilder.param("htkNeed", true);
-                paramBuilder.param("readableNeed", true);
-                paramBuilder.param("pgsNeed", true);
-                paramBuilder.param("plainNeed", true);
-                paramBuilder.param("vadNeed", true);
                 VoiceHelper.startAction(paramBuilder)
                 audioRecord.startRecording()
                 isRecording.set(true)
                 executor.submit(task)
-            } else {
-                audioRecord.stop()
-                isRecording.set(false)
             }
         }
     }
