@@ -47,8 +47,11 @@ class CommanderActivity : AppCompatActivity() {
     }
     private val aiResultListener = object :VoiceHelper.AiResultListener{
         override fun onResult(p0: Int, outputData: AiResponse, p2: Any?) {
-            runOnUiThread {
-                binding.txt.text = String(outputData.value)
+            val key: String = outputData.key
+            if (key.contains("plain") || key.contains("pgs")){
+                runOnUiThread {
+                    binding.txt.text = String(outputData.value, Charset.forName("GB2312"))
+                }
             }
         }
     }
